@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { getTVShowDetails } from '@/lib/tmdb';
 
 /**
@@ -11,7 +11,7 @@ export interface DramaInput {
     tmdbId: number;
     title: string;
     posterPath: string;
-    chosenBy: 'Dan' | 'Carol';
+    chosenBy?: 'Dan' | 'Carol'; // Opcional para watchlist
     status: 'watchlist' | 'watching';
 }
 
@@ -23,7 +23,7 @@ export async function addDrama(data: DramaInput) {
     console.log('[SERVER] addDrama iniciado com dados:', {
         tmdbId: data.tmdbId,
         title: data.title,
-        chosenBy: data.chosenBy,
+        chosenBy: data.chosenBy || 'none',
         status: data.status
     });
 
@@ -37,12 +37,11 @@ export async function addDrama(data: DramaInput) {
         });
 
         // Prepara o documento para salvar
-        const dramaDoc = {
+        const dramaDoc: any = {
             id: data.tmdbId.toString(),
             title: data.title,
             poster_path: data.posterPath,
             status: data.status,
-            chosenBy: data.chosenBy,
             ratings: {
                 dan: 0,
                 carol: 0,
@@ -51,6 +50,11 @@ export async function addDrama(data: DramaInput) {
             watchedEpisodes: 0,
             createdAt: serverTimestamp(),
         };
+
+        // chosenBy é opcional para watchlist
+        if (data.chosenBy) {
+            dramaDoc.chosenBy = data.chosenBy;
+        }
 
         console.log('[SERVER] Salvando no Firestore...');
         // Salva no Firestore
@@ -70,15 +74,32 @@ export async function addDrama(data: DramaInput) {
 
 /**
  * Server Action para atualizar progresso de episódios
+ * Auto-completa o drama quando atingir 100%
  */
 export async function updateDramaProgress(firestoreId: string, watchedEpisodes: number) {
     try {
         const dramaRef = doc(db, 'dramas', firestoreId);
-        await updateDoc(dramaRef, {
-            watchedEpisodes,
-        });
 
-        return { success: true };
+        // Busca o drama atual para verificar totalEpisodes
+        const dramaSnap = await getDoc(dramaRef);
+        if (!dramaSnap.exists()) {
+            throw new Error('Drama não encontrado');
+        }
+
+        const dramaData: any = dramaSnap.data();
+        const updates: any = {
+            watchedEpisodes,
+        };
+
+        // Auto-complete: Se assistiu todos os episódios, marcar como completed
+        if (watchedEpisodes >= dramaData.totalEpisodes && dramaData.totalEpisodes > 0) {
+            updates.status = 'completed';
+            console.log('[SERVER] Auto-completando drama (100% assistido)');
+        }
+
+        await updateDoc(dramaRef, updates);
+
+        return { success: true, autoCompleted: updates.status === 'completed' };
     } catch (error) {
         console.error('Erro ao atualizar progresso:', error);
         throw new Error('Falha ao atualizar progresso.');

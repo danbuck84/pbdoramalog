@@ -18,8 +18,8 @@ interface ContinueWatchingCardProps {
 export function ContinueWatchingCard({ drama, firestoreId }: ContinueWatchingCardProps) {
     const progress = (drama.watchedEpisodes / drama.totalEpisodes) * 100;
 
-    // Define a cor do gradiente baseado em quem escolheu
-    const indicatorClass = drama.chosenBy === 'Dan'
+    // Define a cor do gradiente baseado em quem escolheu (fallback para Dan se undefined)
+    const indicatorClass = (drama.chosenBy || 'Dan') === 'Dan'
         ? 'bg-gradient-to-r from-primary to-cyan-400' // Azul Dan → Ciano
         : 'bg-gradient-to-r from-secondary to-accent'; // Rosa Carol → Roxo Neon
 

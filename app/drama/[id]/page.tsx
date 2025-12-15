@@ -3,8 +3,9 @@
 import { use } from 'react';
 import { useDrama } from '@/hooks/useDrama';
 import { updateDramaProgress, updateDramaRating, deleteDrama } from '@/app/actions/dramas';
+import { updateDramaStatus } from '@/app/actions/updateStatus';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, Heart, Trash2, Plus, Minus } from 'lucide-react';
+import { Loader2, ArrowLeft, Heart, Trash2, Plus, Minus, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -72,6 +73,21 @@ export default function DramaDetailsPage({ params }: PageProps) {
         }
     };
 
+    // Marca como concluído manualmente
+    const handleMarkAsCompleted = async () => {
+        if (!confirm('Marcar este dorama como concluído?')) return;
+
+        setIsUpdating(true);
+        try {
+            await updateDramaStatus(firestoreId, 'completed');
+            toast.success('Dorama marcado como concluído! 🎉');
+        } catch (error) {
+            toast.error('Erro ao atualizar status');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     // Renderiza corações (K-Pop style)
     const renderHearts = (currentRating: number, onRate: (rating: number) => void, color: string) => {
         return (
@@ -85,8 +101,8 @@ export default function DramaDetailsPage({ params }: PageProps) {
                     >
                         <Heart
                             className={`w-7 h-7 ${heart <= currentRating
-                                    ? `fill-${color} text-${color}`
-                                    : 'fill-gray-800/30 text-gray-600/50'
+                                ? `fill-${color} text-${color}`
+                                : 'fill-gray-800/30 text-gray-600/50'
                                 }`}
                             style={{
                                 fill: heart <= currentRating ? color : 'rgba(55, 65, 81, 0.3)',
@@ -165,15 +181,17 @@ export default function DramaDetailsPage({ params }: PageProps) {
                         {drama.title}
                     </h1>
 
-                    {/* Pill "Escolhido por" */}
-                    <div className="flex gap-2">
-                        <span className={`px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-md border ${drama.chosenBy === 'Dan'
+                    {/* Pill "Escolhido por" - só exibe se chosenBy estiver definido */}
+                    {drama.chosenBy && (
+                        <div className="flex gap-2">
+                            <span className={`px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-md border ${drama.chosenBy === 'Dan'
                                 ? 'bg-blue-500/20 border-blue-400/30 text-blue-300'
                                 : 'bg-pink-500/20 border-pink-400/30 text-pink-300'
-                            }`}>
-                            {drama.chosenBy === 'Dan' ? '💙 Escolhido por Dan' : '💗 Escolhido por Carol'}
-                        </span>
-                    </div>
+                                }`}>
+                                {drama.chosenBy === 'Dan' ? '💙 Escolhido por Dan' : '💗 Escolhido por Carol'}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -193,8 +211,8 @@ export default function DramaDetailsPage({ params }: PageProps) {
                                     <Heart
                                         key={heart}
                                         className={`w-6 h-6 ${heart <= Math.round(parseFloat(averageRating))
-                                                ? 'fill-pink-500 text-pink-500'
-                                                : 'fill-gray-700 text-gray-700'
+                                            ? 'fill-pink-500 text-pink-500'
+                                            : 'fill-gray-700 text-gray-700'
                                             }`}
                                     />
                                 ))}
@@ -261,13 +279,13 @@ export default function DramaDetailsPage({ params }: PageProps) {
                         {/* Barra de Progresso Fluida */}
                         <div className="relative h-4 w-full overflow-hidden rounded-full bg-white/10">
                             <div
-                                className={`h-full transition-all duration-500 ease-out rounded-full ${drama.chosenBy === 'Dan'
-                                        ? 'bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500'
-                                        : 'bg-gradient-to-r from-pink-500 via-purple-600 to-pink-500'
+                                className={`h-full transition-all duration-500 ease-out rounded-full ${(drama.chosenBy || 'Dan') === 'Dan'
+                                    ? 'bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500'
+                                    : 'bg-gradient-to-r from-pink-500 via-purple-600 to-pink-500'
                                     } shadow-lg`}
                                 style={{
                                     width: `${progress}%`,
-                                    boxShadow: drama.chosenBy === 'Dan'
+                                    boxShadow: (drama.chosenBy || 'Dan') === 'Dan'
                                         ? '0 0 20px rgba(59, 130, 246, 0.5)'
                                         : '0 0 20px rgba(236, 72, 153, 0.5)'
                                 }}
@@ -302,12 +320,25 @@ export default function DramaDetailsPage({ params }: PageProps) {
                     </div>
                 </div>
 
-                {/* Botão Excluir */}
-                <div className="flex justify-center">
+                {/* Ações Finais */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    {/* Marcar como Concluído - apenas se não estiver completed */}
+                    {drama.status !== 'completed' && (
+                        <button
+                            onClick={handleMarkAsCompleted}
+                            disabled={isUpdating}
+                            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-400 font-bold transition-all disabled:opacity-50"
+                        >
+                            <CheckCircle2 className="h-5 w-5" />
+                            Marcar como Concluído
+                        </button>
+                    )}
+
+                    {/* Excluir */}
                     <button
                         onClick={handleDelete}
                         disabled={isUpdating}
-                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 font-bold transition-all disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 font-bold transition-all disabled:opacity-50"
                     >
                         <Trash2 className="h-5 w-5" />
                         Excluir Dorama

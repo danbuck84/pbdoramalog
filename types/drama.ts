@@ -7,7 +7,7 @@ export interface Drama {
     title: string;
     poster_path: string;
     status: 'watching' | 'completed' | 'watchlist';
-    chosenBy: 'Dan' | 'Carol'; // Define a cor da barra de progresso!
+    chosenBy?: 'Dan' | 'Carol'; // Opcional para watchlist, obrigatório para watching
     ratings: {
         dan: number;   // 0 a 5
         carol: number; // 0 a 5

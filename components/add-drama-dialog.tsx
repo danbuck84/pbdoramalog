@@ -21,9 +21,8 @@ interface AddDramaDialogProps {
 
 /**
  * Dialog para adicionar um drama ao banco de dados
- * - Radio Group para escolher quem selecionou (Dan/Carol)
- * - Select para status inicial (watchlist/watching)
- * - Salva no Firestore via Server Action
+ * - Se watching: escolhe Dan/Carol (obrigatório)
+ * - Se watchlist: "Quem Escolheu" não aparece
  */
 export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDramaDialogProps) {
     const [chosenBy, setChosenBy] = useState<'Dan' | 'Carol'>('Dan');
@@ -40,7 +39,7 @@ export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDrama
                 tmdbId: show.id,
                 title: show.name,
                 posterPath: show.poster_path || '',
-                chosenBy,
+                chosenBy: status === 'watching' ? chosenBy : undefined, // Só envia se watching
                 status,
             });
 
@@ -99,50 +98,10 @@ export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDrama
                         </div>
                     </div>
 
-                    {/* Quem escolheu? */}
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">Quem escolheu?</Label>
-                        <RadioGroup value={chosenBy} onValueChange={(v) => setChosenBy(v as 'Dan' | 'Carol')}>
-                            <div className="flex gap-3">
-                                <div className={`flex-1 relative rounded-lg border-2 transition-all ${chosenBy === 'Dan'
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-border hover:border-primary/50'
-                                    }`}>
-                                    <RadioGroupItem value="Dan" id="dan" className="sr-only" />
-                                    <Label
-                                        htmlFor="dan"
-                                        className="flex items-center justify-center p-4 cursor-pointer"
-                                    >
-                                        <span className={`font-semibold ${chosenBy === 'Dan' ? 'text-primary' : 'text-foreground'
-                                            }`}>
-                                            Dan 💙
-                                        </span>
-                                    </Label>
-                                </div>
-
-                                <div className={`flex-1 relative rounded-lg border-2 transition-all ${chosenBy === 'Carol'
-                                    ? 'border-secondary bg-secondary/5'
-                                    : 'border-border hover:border-secondary/50'
-                                    }`}>
-                                    <RadioGroupItem value="Carol" id="carol" className="sr-only" />
-                                    <Label
-                                        htmlFor="carol"
-                                        className="flex items-center justify-center p-4 cursor-pointer"
-                                    >
-                                        <span className={`font-semibold ${chosenBy === 'Carol' ? 'text-secondary' : 'text-foreground'
-                                            }`}>
-                                            Carol 💗
-                                        </span>
-                                    </Label>
-                                </div>
-                            </div>
-                        </RadioGroup>
-                    </div>
-
                     {/* Status Inicial */}
                     <div className="space-y-3">
                         <Label htmlFor="status" className="text-base font-semibold">
-                            Status Inicial
+                            Como deseja adicionar?
                         </Label>
                         <Select value={status} onValueChange={(v) => setStatus(v as 'watchlist' | 'watching')}>
                             <SelectTrigger id="status">
@@ -154,6 +113,48 @@ export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDrama
                             </SelectContent>
                         </Select>
                     </div>
+
+                    {/* Quem escolheu? (Só aparece se watching) */}
+                    {status === 'watching' && (
+                        <div className="space-y-3">
+                            <Label className="text-base font-semibold">Quem escolheu?</Label>
+                            <RadioGroup value={chosenBy} onValueChange={(v) => setChosenBy(v as 'Dan' | 'Carol')}>
+                                <div className="flex gap-3">
+                                    <div className={`flex-1 relative rounded-lg border-2 transition-all ${chosenBy === 'Dan'
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-border hover:border-primary/50'
+                                        }`}>
+                                        <RadioGroupItem value="Dan" id="dan" className="sr-only" />
+                                        <Label
+                                            htmlFor="dan"
+                                            className="flex items-center justify-center p-4 cursor-pointer"
+                                        >
+                                            <span className={`font-semibold ${chosenBy === 'Dan' ? 'text-primary' : 'text-foreground'
+                                                }`}>
+                                                Dan 💙
+                                            </span>
+                                        </Label>
+                                    </div>
+
+                                    <div className={`flex-1 relative rounded-lg border-2 transition-all ${chosenBy === 'Carol'
+                                        ? 'border-secondary bg-secondary/5'
+                                        : 'border-border hover:border-secondary/50'
+                                        }`}>
+                                        <RadioGroupItem value="Carol" id="carol" className="sr-only" />
+                                        <Label
+                                            htmlFor="carol"
+                                            className="flex items-center justify-center p-4 cursor-pointer"
+                                        >
+                                            <span className={`font-semibold ${chosenBy === 'Carol' ? 'text-secondary' : 'text-foreground'
+                                                }`}>
+                                                Carol 💗
+                                            </span>
+                                        </Label>
+                                    </div>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    )}
 
                     {/* Botão Confirmar */}
                     <Button
