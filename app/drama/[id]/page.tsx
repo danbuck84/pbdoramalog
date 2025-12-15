@@ -156,19 +156,12 @@ export default function DramaDetailsPage({ params }: PageProps) {
                         className="object-cover"
                         priority
                     />
-                    {/* Gradient Overlays K-Pop Style */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-zinc-950" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-pink-500/20 to-cyan-400/30 mix-blend-overlay" />
                 </div>
 
-                {/* Botão Voltar (Glassmorphism) */}
-                <Link href="/" className="absolute top-6 left-6 z-10">
-                    <button className="flex items-center justify-center size-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition">
-                        <ArrowLeft className="h-5 w-5" />
-                    </button>
-                </Link>
+                {/* Gradient Fadeout Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-background" />
 
-                {/* Título e Pills na parte inferior */}
+                {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 space-y-3 z-10">
                     {/* Status Pill */}
                     <span className="inline-block px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-primary text-xs font-bold uppercase tracking-wider">
@@ -185,8 +178,8 @@ export default function DramaDetailsPage({ params }: PageProps) {
                     {drama.chosenBy && (
                         <div className="flex gap-2">
                             <span className={`px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-md border ${drama.chosenBy === 'Dan'
-                                ? 'bg-blue-500/20 border-blue-400/30 text-blue-300'
-                                : 'bg-pink-500/20 border-pink-400/30 text-pink-300'
+                                    ? 'bg-blue-500/20 border-blue-400/30 text-blue-300'
+                                    : 'bg-pink-500/20 border-pink-400/30 text-pink-300'
                                 }`}>
                                 {drama.chosenBy === 'Dan' ? '💙 Escolhido por Dan' : '💗 Escolhido por Carol'}
                             </span>
@@ -194,6 +187,13 @@ export default function DramaDetailsPage({ params }: PageProps) {
                     )}
                 </div>
             </div>
+
+            {/* Botão Voltar (Glassmorphism) */}
+            <Link href="/" className="absolute top-6 left-6 z-10">
+                <button className="flex items-center justify-center size-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition">
+                    <ArrowLeft className="h-5 w-5" />
+                </button>
+            </Link>
 
             {/* Main Content */}
             <div className="relative z-10 px-4 md:px-6 pb-24 -mt-20 max-w-4xl mx-auto">

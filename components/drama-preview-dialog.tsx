@@ -26,15 +26,15 @@ export function DramaPreviewDialog({ open, onOpenChange, details, isLoading, onA
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl max-w-[90vw] max-h-[90vh] overflow-y-auto overflow-x-hidden">
+            <DialogContent className="w-full max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="h-12 w-12 animate-spin text-primary" />
                     </div>
                 ) : details ? (
                     <>
-                        <DialogTitle className="text-2xl font-bold">{details.name}</DialogTitle>
                         <DialogHeader>
+                            <DialogTitle className="text-2xl font-bold">{details.name}</DialogTitle>
                             <DialogDescription className="text-sm text-muted-foreground">
                                 Detalhes completos do dorama antes de adicionar à lista
                             </DialogDescription>
