@@ -12,7 +12,7 @@ import { Search, Loader2, Plus } from 'lucide-react';
 import Image from 'next/image';
 
 // HARDCODED API KEY - Client-side fetch para bypass de Server Actions
-const API_KEY = "ecf96accd07316dca02dc0656f3c0a93";
+const API_KEY = "cc8d2bb815d2b5cc0a96106925aa7ab8";
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 /**
