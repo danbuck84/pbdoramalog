@@ -1,6 +1,5 @@
 import { Drama } from '@/types/drama';
 import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -45,7 +44,12 @@ export function ContinueWatchingCard({ drama, firestoreId }: ContinueWatchingCar
 
                 {/* Barra de Progresso */}
                 <div className="space-y-2">
-                    <Progress value={progress} className="h-2" indicatorClassName={indicatorClass} />
+                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                            className={`h-full transition-all ${indicatorClass}`}
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
                     <p className="text-xs text-muted-foreground text-right">
                         {Math.round(progress)}%
                     </p>
