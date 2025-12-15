@@ -45,7 +45,7 @@ export function ContinueWatchingCarousel({ dramas }: ContinueWatchingCarouselPro
                     return (
                         <Link
                             key={drama.id}
-                            href={`/drama/${drama.firestoreId}`}
+                            href={`/drama/${drama.firestoreId || drama.id}`}
                             className="flex-shrink-0 w-80 snap-start group"
                         >
                             <div className="relative h-44 rounded-xl overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105">
