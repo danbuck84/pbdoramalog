@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -66,6 +66,9 @@ export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDrama
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold">Adicionar Dorama</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Preencha os dados abaixo para adicionar um novo dorama à sua lista
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-6">
@@ -102,8 +105,8 @@ export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDrama
                         <RadioGroup value={chosenBy} onValueChange={(v) => setChosenBy(v as 'Dan' | 'Carol')}>
                             <div className="flex gap-3">
                                 <div className={`flex-1 relative rounded-lg border-2 transition-all ${chosenBy === 'Dan'
-                                        ? 'border-primary bg-primary/5'
-                                        : 'border-border hover:border-primary/50'
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-border hover:border-primary/50'
                                     }`}>
                                     <RadioGroupItem value="Dan" id="dan" className="sr-only" />
                                     <Label
@@ -118,8 +121,8 @@ export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDrama
                                 </div>
 
                                 <div className={`flex-1 relative rounded-lg border-2 transition-all ${chosenBy === 'Carol'
-                                        ? 'border-secondary bg-secondary/5'
-                                        : 'border-border hover:border-secondary/50'
+                                    ? 'border-secondary bg-secondary/5'
+                                    : 'border-border hover:border-secondary/50'
                                     }`}>
                                     <RadioGroupItem value="Carol" id="carol" className="sr-only" />
                                     <Label

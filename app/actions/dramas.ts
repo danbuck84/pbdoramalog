@@ -20,9 +20,21 @@ export interface DramaInput {
  * Busca detalhes completos do TMDB e salva na coleção 'dramas'
  */
 export async function addDrama(data: DramaInput) {
+    console.log('[SERVER] addDrama iniciado com dados:', {
+        tmdbId: data.tmdbId,
+        title: data.title,
+        chosenBy: data.chosenBy,
+        status: data.status
+    });
+
     try {
         // Busca detalhes completos do TMDB (incluindo número de episódios)
+        console.log('[SERVER] Buscando detalhes do TMDB para ID:', data.tmdbId);
         const details = await getTVShowDetails(data.tmdbId);
+        console.log('[SERVER] Detalhes obtidos:', {
+            name: details.name,
+            episodes: details.number_of_episodes
+        });
 
         // Prepara o documento para salvar
         const dramaDoc = {
@@ -40,12 +52,18 @@ export async function addDrama(data: DramaInput) {
             createdAt: serverTimestamp(),
         };
 
+        console.log('[SERVER] Salvando no Firestore...');
         // Salva no Firestore
         const docRef = await addDoc(collection(db, 'dramas'), dramaDoc);
+        console.log('[SERVER] Salvo com sucesso! Doc ID:', docRef.id);
 
         return { success: true, id: docRef.id };
     } catch (error) {
-        console.error('Erro ao adicionar drama:', error);
+        console.error('[SERVER] ERRO DETALHADO ao adicionar drama:');
+        console.error('[SERVER] Tipo do erro:', error instanceof Error ? error.constructor.name : typeof error);
+        console.error('[SERVER] Mensagem:', error instanceof Error ? error.message : String(error));
+        console.error('[SERVER] Stack:', error instanceof Error ? error.stack : 'N/A');
+        console.error('[SERVER] Dados recebidos:', data);
         throw new Error('Falha ao adicionar drama. Tente novamente.');
     }
 }
