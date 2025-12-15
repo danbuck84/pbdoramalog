@@ -1,52 +1,130 @@
 'use client';
 
-import { Drama } from '@/types/drama';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { use } from 'react';
+import { useDrama } from '@/hooks/useDrama';
+import { updateDramaProgress, updateDramaRating, deleteDrama } from '@/app/actions/dramas';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Star, Plus, Minus, Trash2, Loader2, ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
 import Image from 'next/image';
-import { Star } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-interface DramaDetailsProps {
-    drama: Drama;
+interface PageProps {
+    params: Promise<{ id: string }>;
 }
 
 /**
- * Página de Detalhes com design "Dark Cinema"
- * Features:
- * - Background escuro (#0a0a0a)
- * - Split Rating System: Nota Média (grande) + Notas Individuais (pequenas com avatar)
- * - Layout imersivo estilo cinema
+ * Página de detalhes do dorama com design Dark Cinema
+ * - Edição de ratings (Dan e Carol)
+ * - Controle de progresso de episódios
+ * - Botão de exclusão
  */
-export default function DramaDetails({ drama }: DramaDetailsProps) {
-    // Calcula nota média
-    const averageRating = ((drama.ratings.dan + drama.ratings.carol) / 2).toFixed(1);
-    const progress = (drama.watchedEpisodes / drama.totalEpisodes) * 100;
+export default function DramaDetailsPage({ params }: PageProps) {
+    const { id: firestoreId } = use(params);
+    const { drama, isLoading } = useDrama(firestoreId);
+    const router = useRouter();
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    // Função para renderizar estrelas
-    const renderStars = (rating: number, size: 'sm' | 'lg' = 'sm') => {
-        const sizeClass = size === 'lg' ? 'w-6 h-6' : 'w-4 h-4';
+    // Atualiza progresso
+    const handleUpdateProgress = async (change: number) => {
+        if (!drama) return;
+
+        const newProgress = Math.max(0, Math.min(drama.totalEpisodes, drama.watchedEpisodes + change));
+
+        setIsUpdating(true);
+        try {
+            await updateDramaProgress(firestoreId, newProgress);
+            toast.success('Progresso atualizado!');
+        } catch (error) {
+            toast.error('Erro ao atualizar progresso');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    // Atualiza rating
+    const handleUpdateRating = async (user: 'dan' | 'carol', rating: number) => {
+        setIsUpdating(true);
+        try {
+            await updateDramaRating(firestoreId, user, rating);
+            toast.success(`Nota de ${user === 'dan' ? 'Dan' : 'Carol'} atualizada!`);
+        } catch (error) {
+            toast.error('Erro ao atualizar nota');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    // Deleta drama
+    const handleDelete = async () => {
+        if (!confirm('Tem certeza que deseja excluir este dorama?')) return;
+
+        setIsUpdating(true);
+        try {
+            await deleteDrama(firestoreId);
+            toast.success('Dorama excluído com sucesso!');
+            router.push('/');
+        } catch (error) {
+            toast.error('Erro ao excluir dorama');
+            setIsUpdating(false);
+        }
+    };
+
+    // Renderiza estrelas
+    const renderStars = (currentRating: number, onRate: (rating: number) => void) => {
         return (
             <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
+                    <button
                         key={star}
-                        className={`${sizeClass} ${star <= rating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'fill-muted text-muted'
-                            }`}
-                    />
+                        onClick={() => onRate(star)}
+                        disabled={isUpdating}
+                        className="transition-transform hover:scale-110 disabled:opacity-50"
+                    >
+                        <Star
+                            className={`w-8 h-8 ${star <= currentRating
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'fill-muted text-muted'
+                                }`}
+                        />
+                    </button>
                 ))}
             </div>
         );
     };
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-background-dark dark flex items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (!drama) {
+        return (
+            <div className="min-h-screen bg-background-dark dark flex flex-col items-center justify-center gap-4">
+                <p className="text-white text-xl">Dorama não encontrado</p>
+                <Link href="/">
+                    <Button>Voltar para Home</Button>
+                </Link>
+            </div>
+        );
+    }
+
+    const progress = (drama.watchedEpisodes / drama.totalEpisodes) * 100;
+    const averageRating = ((drama.ratings.dan + drama.ratings.carol) / 2).toFixed(1);
+
     return (
         <div className="min-h-screen bg-background-dark dark text-white">
-            {/* Header com backdrop do poster */}
+            {/* Header com backdrop */}
             <div className="relative h-[50vh] w-full overflow-hidden">
-                {/* Backdrop image */}
                 <div className="absolute inset-0">
                     <Image
                         src={`https://image.tmdb.org/t/p/original${drama.poster_path}`}
@@ -55,15 +133,19 @@ export default function DramaDetails({ drama }: DramaDetailsProps) {
                         className="object-cover"
                         priority
                     />
-                    {/* Gradient overlay para legibilidade */}
                     <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/70 to-transparent" />
                 </div>
 
-                {/* Content overlay */}
+                {/* Botão Voltar */}
+                <Link href="/" className="absolute top-6 left-6 z-10">
+                    <Button variant="outline" className="bg-black/50 border-white/20 hover:bg-black/70">
+                        <ArrowLeft className="mr-2 h-5 w-5" />
+                        Voltar
+                    </Button>
+                </Link>
+
                 <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
                     <h1 className="text-4xl font-bold">{drama.title}</h1>
-
-                    {/* Badges de status */}
                     <div className="flex gap-2">
                         <Badge
                             variant="outline"
@@ -83,21 +165,27 @@ export default function DramaDetails({ drama }: DramaDetailsProps) {
                 </div>
             </div>
 
-            {/* Main Content */}
+            {/* Content */}
             <div className="container max-w-4xl mx-auto px-6 py-8 space-y-8">
-
                 {/* Split Rating System */}
-                <Card className="bg-card-dark border-border">
+                <Card className="bg-card border-border">
                     <CardContent className="p-6">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                            {/* Nota Média (Destaque) */}
+                            {/* Nota Média */}
                             <div className="md:col-span-3 flex flex-col items-center justify-center py-6 border-b border-border">
                                 <p className="text-sm text-muted-foreground mb-2">Nota Média</p>
-                                <div className="text-6xl font-bold text-white mb-3">
-                                    {averageRating}
+                                <div className="text-6xl font-bold mb-3">{averageRating}</div>
+                                <div className="flex gap-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star
+                                            key={star}
+                                            className={`w-6 h-6 ${star <= Math.round(parseFloat(averageRating))
+                                                    ? 'fill-yellow-400 text-yellow-400'
+                                                    : 'fill-muted text-muted'
+                                                }`}
+                                        />
+                                    ))}
                                 </div>
-                                {renderStars(Math.round(parseFloat(averageRating)), 'lg')}
                             </div>
 
                             {/* Nota Dan */}
@@ -110,11 +198,10 @@ export default function DramaDetails({ drama }: DramaDetailsProps) {
                                 <div className="text-center space-y-1">
                                     <p className="text-sm text-muted-foreground">Dan</p>
                                     <p className="text-2xl font-bold">{drama.ratings.dan.toFixed(1)}</p>
-                                    {renderStars(drama.ratings.dan)}
+                                    {renderStars(drama.ratings.dan, (rating) => handleUpdateRating('dan', rating))}
                                 </div>
                             </div>
 
-                            {/* Separator vertical (desktop) */}
                             <Separator orientation="vertical" className="hidden md:block justify-self-center h-full" />
 
                             {/* Nota Carol */}
@@ -127,18 +214,18 @@ export default function DramaDetails({ drama }: DramaDetailsProps) {
                                 <div className="text-center space-y-1">
                                     <p className="text-sm text-muted-foreground">Carol</p>
                                     <p className="text-2xl font-bold">{drama.ratings.carol.toFixed(1)}</p>
-                                    {renderStars(drama.ratings.carol)}
+                                    {renderStars(drama.ratings.carol, (rating) => handleUpdateRating('carol', rating))}
                                 </div>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Progresso */}
-                <Card className="bg-card-dark border-border">
+                {/* Controle de Progresso */}
+                <Card className="bg-card border-border">
                     <CardContent className="p-6 space-y-4">
                         <h3 className="text-lg font-semibold">Progresso</h3>
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">
                                     Episódio {drama.watchedEpisodes} de {drama.totalEpisodes}
@@ -154,9 +241,46 @@ export default function DramaDetails({ drama }: DramaDetailsProps) {
                                     style={{ width: `${progress}%` }}
                                 />
                             </div>
+
+                            {/* Botões de Controle */}
+                            <div className="flex items-center justify-center gap-4">
+                                <Button
+                                    onClick={() => handleUpdateProgress(-1)}
+                                    disabled={isUpdating || drama.watchedEpisodes === 0}
+                                    variant="outline"
+                                    size="lg"
+                                >
+                                    <Minus className="h-5 w-5" />
+                                </Button>
+                                <div className="text-center min-w-[100px]">
+                                    <p className="text-2xl font-bold">{drama.watchedEpisodes}</p>
+                                    <p className="text-xs text-muted-foreground">episódios</p>
+                                </div>
+                                <Button
+                                    onClick={() => handleUpdateProgress(1)}
+                                    disabled={isUpdating || drama.watchedEpisodes === drama.totalEpisodes}
+                                    variant="outline"
+                                    size="lg"
+                                >
+                                    <Plus className="h-5 w-5" />
+                                </Button>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Botão Excluir */}
+                <div className="flex justify-center py-4">
+                    <Button
+                        onClick={handleDelete}
+                        disabled={isUpdating}
+                        variant="destructive"
+                        size="lg"
+                    >
+                        <Trash2 className="mr-2 h-5 w-5" />
+                        Excluir Dorama
+                    </Button>
+                </div>
             </div>
         </div>
     );

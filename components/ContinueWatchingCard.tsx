@@ -2,9 +2,11 @@ import { Drama } from '@/types/drama';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface ContinueWatchingCardProps {
     drama: Drama;
+    firestoreId?: string;
 }
 
 /**
@@ -13,7 +15,7 @@ interface ContinueWatchingCardProps {
  * - Dan: Gradiente Azul/Ciano
  * - Carol: Gradiente Rosa/Roxo
  */
-export function ContinueWatchingCard({ drama }: ContinueWatchingCardProps) {
+export function ContinueWatchingCard({ drama, firestoreId }: ContinueWatchingCardProps) {
     const progress = (drama.watchedEpisodes / drama.totalEpisodes) * 100;
 
     // Define a cor do gradiente baseado em quem escolheu
@@ -21,8 +23,8 @@ export function ContinueWatchingCard({ drama }: ContinueWatchingCardProps) {
         ? 'bg-gradient-to-r from-primary to-cyan-400' // Azul Dan → Ciano
         : 'bg-gradient-to-r from-secondary to-accent'; // Rosa Carol → Roxo Neon
 
-    return (
-        <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    const cardContent = (
+        <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
             <div className="relative aspect-[2/3] w-full">
                 <Image
                     src={`https://image.tmdb.org/t/p/w500${drama.poster_path}`}
@@ -62,4 +64,11 @@ export function ContinueWatchingCard({ drama }: ContinueWatchingCardProps) {
             <div className={`h-1 ${indicatorClass}`} />
         </Card>
     );
+
+    // Se temos firestoreId, envolve com Link
+    if (firestoreId) {
+        return <Link href={`/drama/${firestoreId}`}>{cardContent}</Link>;
+    }
+
+    return cardContent;
 }

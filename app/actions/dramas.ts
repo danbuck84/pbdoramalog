@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { getTVShowDetails } from '@/lib/tmdb';
 
 /**
@@ -47,5 +47,58 @@ export async function addDrama(data: DramaInput) {
     } catch (error) {
         console.error('Erro ao adicionar drama:', error);
         throw new Error('Falha ao adicionar drama. Tente novamente.');
+    }
+}
+
+/**
+ * Server Action para atualizar progresso de episódios
+ */
+export async function updateDramaProgress(firestoreId: string, watchedEpisodes: number) {
+    try {
+        const dramaRef = doc(db, 'dramas', firestoreId);
+        await updateDoc(dramaRef, {
+            watchedEpisodes,
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro ao atualizar progresso:', error);
+        throw new Error('Falha ao atualizar progresso.');
+    }
+}
+
+/**
+ * Server Action para atualizar rating de um usuário
+ */
+export async function updateDramaRating(
+    firestoreId: string,
+    user: 'dan' | 'carol',
+    rating: number
+) {
+    try {
+        const dramaRef = doc(db, 'dramas', firestoreId);
+        await updateDoc(dramaRef, {
+            [`ratings.${user}`]: rating,
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro ao atualizar rating:', error);
+        throw new Error('Falha ao atualizar rating.');
+    }
+}
+
+/**
+ * Server Action para deletar um drama
+ */
+export async function deleteDrama(firestoreId: string) {
+    try {
+        const dramaRef = doc(db, 'dramas', firestoreId);
+        await deleteDoc(dramaRef);
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro ao deletar drama:', error);
+        throw new Error('Falha ao deletar drama.');
     }
 }

@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Drama } from '@/types/drama';
+
+export interface DramaWithFirestoreId extends Drama {
+    firestoreId: string; // ID do documento no Firestore
+}
 
 /**
  * Hook para buscar e escutar mudanças em tempo real dos doramas no Firestore
  * Usa onSnapshot para atualização automática quando dados mudam
  */
 export function useDramas() {
-    const [dramas, setDramas] = useState<Drama[]>([]);
+    const [dramas, setDramas] = useState<DramaWithFirestoreId[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
@@ -23,9 +27,10 @@ export function useDramas() {
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
-                const dramasData: Drama[] = snapshot.docs.map((doc) => ({
+                const dramasData: DramaWithFirestoreId[] = snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
                     ...(doc.data() as Omit<Drama, 'id'>),
-                    id: doc.data().id || doc.id, // Usa o id do TMDB ou fallback para doc.id
+                    id: doc.data().id || doc.id,
+                    firestoreId: doc.id, // ID do documento no Firestore
                 }));
 
                 setDramas(dramasData);

@@ -42,7 +42,7 @@ export default function Home() {
               {dramas
                 .filter((d) => d.status === 'watching')
                 .map((drama) => (
-                  <ContinueWatchingCard key={drama.id} drama={drama} />
+                  <ContinueWatchingCard key={drama.id} drama={drama} firestoreId={drama.firestoreId} />
                 ))}
             </div>
           ) : (
@@ -65,7 +65,7 @@ export default function Home() {
               {dramas
                 .filter((d) => d.status === 'completed')
                 .map((drama) => (
-                  <ContinueWatchingCard key={drama.id} drama={drama} />
+                  <ContinueWatchingCard key={drama.id} drama={drama} firestoreId={drama.firestoreId} />
                 ))}
             </div>
           ) : (
