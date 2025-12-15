@@ -17,10 +17,13 @@ interface ContinueWatchingCardProps {
 export function ContinueWatchingCard({ drama, firestoreId }: ContinueWatchingCardProps) {
     const progress = (drama.watchedEpisodes / drama.totalEpisodes) * 100;
 
-    // Define a cor do gradiente baseado em quem escolheu (fallback para Dan se undefined)
-    const indicatorClass = (drama.chosenBy || 'Dan') === 'Dan'
-        ? 'bg-gradient-to-r from-primary to-cyan-400' // Azul Dan → Ciano
-        : 'bg-gradient-to-r from-secondary to-accent'; // Rosa Carol → Roxo Neon
+    // Define a cor do gradiente baseado em quem escolheu
+    // Dan: Cyan/Blue | Carol: Pink/Rose | Undefined (Watchlist): Purple
+    const indicatorClass = drama.chosenBy === 'Dan'
+        ? 'bg-gradient-to-r from-cyan-500 to-blue-500'
+        : drama.chosenBy === 'Carol'
+            ? 'bg-gradient-to-r from-pink-500 to-rose-500'
+            : 'bg-gradient-to-r from-purple-500 to-violet-500'; // Watchlist/Shared
 
     const cardContent = (
         <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer flex flex-col h-full">

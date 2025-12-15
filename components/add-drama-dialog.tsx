@@ -26,7 +26,7 @@ interface AddDramaDialogProps {
  */
 export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDramaDialogProps) {
     const [chosenBy, setChosenBy] = useState<'Dan' | 'Carol'>('Dan');
-    const [status, setStatus] = useState<'watchlist' | 'watching'>('watchlist');
+    const [status, setStatus] = useState<'watchlist' | 'watching' | 'completed'>('watchlist');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async () => {
@@ -39,7 +39,7 @@ export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDrama
                 tmdbId: show.id,
                 title: show.name,
                 posterPath: show.poster_path || '',
-                chosenBy: status === 'watching' ? chosenBy : undefined, // Só envia se watching
+                chosenBy: status === 'watching' ? chosenBy : undefined, // Só para watching
                 status,
             });
 
@@ -103,13 +103,14 @@ export function AddDramaDialog({ open, onOpenChange, show, onSuccess }: AddDrama
                         <Label htmlFor="status" className="text-base font-semibold">
                             Como deseja adicionar?
                         </Label>
-                        <Select value={status} onValueChange={(v) => setStatus(v as 'watchlist' | 'watching')}>
+                        <Select value={status} onValueChange={(v) => setStatus(v as 'watchlist' | 'watching' | 'completed')}>
                             <SelectTrigger id="status">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="watchlist">📋 Quero Ver (Watchlist)</SelectItem>
                                 <SelectItem value="watching">▶️ Assistindo Agora (Watching)</SelectItem>
+                                <SelectItem value="completed">✓ Já Assistido (Completed)</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

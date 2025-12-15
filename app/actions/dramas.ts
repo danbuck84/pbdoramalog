@@ -11,8 +11,8 @@ export interface DramaInput {
     tmdbId: number;
     title: string;
     posterPath: string;
-    chosenBy?: 'Dan' | 'Carol'; // Opcional para watchlist
-    status: 'watchlist' | 'watching';
+    chosenBy?: 'Dan' | 'Carol'; // Opcional para watchlist e completed
+    status: 'watchlist' | 'watching' | 'completed';
 }
 
 /**
@@ -57,11 +57,11 @@ export async function addDrama(data: DramaInput) {
                 carol: 0,
             },
             totalEpisodes: details.number_of_episodes || 0,
-            watchedEpisodes: 0,
+            watchedEpisodes: data.status === 'completed' ? (details.number_of_episodes || 0) : 0, // Auto-complete se já assistido
             createdAt: serverTimestamp(),
         };
 
-        // chosenBy é opcional para watchlist
+        // chosenBy é opcional para watchlist e completed
         if (data.chosenBy) {
             dramaDoc.chosenBy = data.chosenBy;
         }
