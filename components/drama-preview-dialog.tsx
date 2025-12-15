@@ -26,7 +26,7 @@ export function DramaPreviewDialog({ open, onOpenChange, details, isLoading, onA
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl max-w-[90vw] max-h-[90vh] overflow-y-auto">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="h-12 w-12 animate-spin text-primary" />

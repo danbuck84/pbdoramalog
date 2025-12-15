@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { getTVShowDetails } from '@/lib/tmdb';
 
 /**
@@ -28,6 +28,16 @@ export async function addDrama(data: DramaInput) {
     });
 
     try {
+        // Verifica se já existe dorama com esse tmdbId
+        const dramasRef = collection(db, 'dramas');
+        const q = query(dramasRef, where('id', '==', data.tmdbId.toString()));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            console.log('[SERVER] Dorama já existe na lista (duplicata bloqueada)');
+            throw new Error('Este dorama já está na sua lista!');
+        }
+
         // Busca detalhes completos do TMDB (incluindo número de episódios)
         console.log('[SERVER] Buscando detalhes do TMDB para ID:', data.tmdbId);
         const details = await getTVShowDetails(data.tmdbId);

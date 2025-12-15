@@ -24,8 +24,8 @@ export function ContinueWatchingCard({ drama, firestoreId }: ContinueWatchingCar
         : 'bg-gradient-to-r from-secondary to-accent'; // Rosa Carol → Roxo Neon
 
     const cardContent = (
-        <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer">
-            <div className="relative aspect-[2/3] w-full">
+        <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer flex flex-col h-full">
+            <div className="relative aspect-[2/3] w-full flex-shrink-0">
                 <Image
                     src={`https://image.tmdb.org/t/p/w500${drama.poster_path}`}
                     alt={drama.title}
@@ -35,28 +35,20 @@ export function ContinueWatchingCard({ drama, firestoreId }: ContinueWatchingCar
                 />
             </div>
 
-            <CardContent className="p-4 space-y-3">
-                <div>
+            <CardContent className="p-4 space-y-3 flex-1 flex flex-col">
+                <div className="flex-1">
                     <h3 className="font-semibold text-lg line-clamp-1">{drama.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                        Ep {drama.watchedEpisodes} de {drama.totalEpisodes}
+                    <p className="text-sm text-muted-foreground mt-1">
+                        {drama.watchedEpisodes} / {drama.totalEpisodes} eps
                     </p>
                 </div>
 
-                {/* Barra de progresso com cor dinâmica */}
+                {/* Barra de Progresso */}
                 <div className="space-y-2">
-                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                            className={`h-full transition-all ${indicatorClass}`}
-                            style={{ width: `${progress}%` }}
-                        />
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                        <span className={drama.chosenBy === 'Dan' ? 'text-primary font-medium' : 'text-secondary font-medium'}>
-                            Escolhido por {drama.chosenBy}
-                        </span>
-                        <span className="text-muted-foreground">{Math.round(progress)}%</span>
-                    </div>
+                    <Progress value={progress} className="h-2" indicatorClassName={indicatorClass} />
+                    <p className="text-xs text-muted-foreground text-right">
+                        {Math.round(progress)}%
+                    </p>
                 </div>
             </CardContent>
 
