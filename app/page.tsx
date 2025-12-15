@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { ContinueWatchingCard } from '@/components/ContinueWatchingCard';
-import { SearchDialog } from '@/components/SearchDialog';
+import { DramaSearch } from '@/components/drama-search';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Drama } from '@/types/drama';
-import { TMDBShow } from '@/types/tmdb';
-import { Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 // Dados mock para demonstração
 const mockDramas: Drama[] = [
@@ -44,20 +44,14 @@ const mockDramas: Drama[] = [
 
 
 export default function Home() {
-  const [searchOpen, setSearchOpen] = useState(false);
-
-  const handleSelectShow = (show: TMDBShow) => {
-    console.log('Dorama selecionado:', show);
-    // TODO: Adicionar ao Firestore (próxima fase)
-    alert(`Selecionado: ${show.name}\nTODO: Adicionar integração com Firestore`);
-  };
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
     <>
       <main className="min-h-screen bg-background">
         {/* Header */}
-        <header className="border-b border-border sticky top-0 z-50 bg-background/80 backdrop-blur-md">
-          <div className="container max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+        <header className="border-b border-border sticky top-0 z-40 bg-background/80 backdrop-blur-md">
+          <div className="container max-w-6xl mx-auto px-6 py-6">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                 PB DoramaLog
@@ -66,16 +60,6 @@ export default function Home() {
                 Tracker de Doramas: Dan & Carol 💙💗
               </p>
             </div>
-
-            {/* Botão de busca */}
-            <Button
-              onClick={() => setSearchOpen(true)}
-              size="lg"
-              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-            >
-              <Search className="mr-2 h-5 w-5" />
-              Buscar Dorama
-            </Button>
           </div>
         </header>
 
@@ -106,12 +90,28 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Search Dialog */}
-      <SearchDialog
-        open={searchOpen}
-        onOpenChange={setSearchOpen}
-        onSelectShow={handleSelectShow}
-      />
+      {/* Botão Flutuante (FAB) + Sheet de Busca */}
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetTrigger asChild>
+          <Button
+            size="lg"
+            className="fixed bottom-8 right-8 z-50 h-16 w-16 rounded-full shadow-2xl bg-gradient-to-r from-primary to-secondary hover:opacity-90 hover:scale-110 transition-all"
+          >
+            <Plus className="h-8 w-8" />
+            <span className="sr-only">Adicionar Drama</span>
+          </Button>
+        </SheetTrigger>
+
+        <SheetContent side="right" className="w-full sm:max-w-lg">
+          <SheetHeader className="mb-6">
+            <SheetTitle className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              Buscar Dorama
+            </SheetTitle>
+          </SheetHeader>
+
+          <DramaSearch />
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
