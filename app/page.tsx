@@ -84,40 +84,27 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="text-center py-12 space-y-3">
-                  <p className="text-muted-foreground text-lg">
-                    Sua lista "Quero Ver" está vazia
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Adicione doramas que deseja assistir no futuro!
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-
-            {/* Aba: Concluídos */}
-            <TabsContent value="completed" className="space-y-4">
-              <h2 className="text-2xl font-semibold">Completados</h2>
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : completed.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {completed.map((drama) => (
-                    <ContinueWatchingCard key={drama.id} drama={drama} firestoreId={drama.firestoreId} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 space-y-3">
-                  <p className="text-muted-foreground text-lg">
-                    Nada concluído ainda? Bora maratonar! 🍿
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Doramas completados aparecerão aqui
-                  </p>
-                </div>
-              )}
-            </TabsContent>
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : completed.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                      {completed.map((drama) => (
+                        <ContinueWatchingCard key={drama.id} drama={drama} firestoreId={drama.firestoreId} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 space-y-3">
+                      <p className="text-muted-foreground text-lg">
+                        Nada concluído ainda? Bora maratonar! 🍿
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Doramas completados aparecerão aqui
+                      </p>
+                    </div>
+                  )}
+                </TabsContent>
           </Tabs>
         </section>
       </main>
