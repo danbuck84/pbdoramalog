@@ -1,6 +1,5 @@
 import { TMDBSearchResult, TMDBShowDetails } from '@/types/tmdb';
 
-const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 /**
@@ -19,8 +18,16 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
  * @returns Lista de resultados da busca
  */
 export async function searchTVShows(query: string): Promise<TMDBSearchResult> {
-    if (!TMDB_API_KEY) {
-        throw new Error('TMDB_API_KEY não configurada no .env.local');
+    // ROBUST KEY CHECK: Tenta múltiplas fontes
+    const apiKey = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY;
+
+    // LOG DE DEBUG (servidor)
+    console.log('[TMDB] Usando chave:', apiKey ? `Sim (Length: ${apiKey.length})` : 'NÃO ENCONTRADA');
+
+    if (!apiKey) {
+        console.error('[TMDB] ERRO CRÍTICO: API Key não configurada em nenhuma variável de ambiente');
+        // Não quebra a aplicação, retorna array vazio
+        return { page: 1, results: [], total_pages: 0, total_results: 0 };
     }
 
     if (!query.trim()) {
@@ -29,22 +36,31 @@ export async function searchTVShows(query: string): Promise<TMDBSearchResult> {
 
     try {
         const url = new URL(`${TMDB_BASE_URL}/search/tv`);
-        url.searchParams.set('api_key', TMDB_API_KEY);
+        url.searchParams.set('api_key', apiKey);
         url.searchParams.set('query', query);
         url.searchParams.set('language', 'pt-BR'); // Resultados em português
         url.searchParams.set('include_adult', 'false');
 
+        console.log('[TMDB] Fazendo requisição para:', url.toString().replace(apiKey, 'HIDDEN'));
+
         const response = await fetch(url.toString());
 
         if (!response.ok) {
-            throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
+            console.error('[TMDB Status]:', response.status, response.statusText);
+            const errorText = await response.text();
+            console.error('[TMDB Response Body]:', errorText);
+
+            // Não quebra a aplicação, retorna array vazio
+            return { page: 1, results: [], total_pages: 0, total_results: 0 };
         }
 
         const data: TMDBSearchResult = await response.json();
+        console.log('[TMDB] Busca bem-sucedida:', data.results.length, 'resultados encontrados');
         return data;
     } catch (error) {
-        console.error('Erro ao buscar shows no TMDB:', error);
-        throw error;
+        console.error('[TMDB Error]:', error);
+        // Não quebra a aplicação, retorna array vazio
+        return { page: 1, results: [], total_pages: 0, total_results: 0 };
     }
 }
 
@@ -54,25 +70,37 @@ export async function searchTVShows(query: string): Promise<TMDBSearchResult> {
  * @returns Detalhes completos do show
  */
 export async function getTVShowDetails(tvId: number): Promise<TMDBShowDetails> {
-    if (!TMDB_API_KEY) {
-        throw new Error('TMDB_API_KEY não configurada no .env.local');
+    // ROBUST KEY CHECK: Tenta múltiplas fontes
+    const apiKey = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY;
+
+    console.log('[TMDB Details] Usando chave:', apiKey ? `Sim (Length: ${apiKey.length})` : 'NÃO ENCONTRADA');
+
+    if (!apiKey) {
+        console.error('[TMDB Details] ERRO CRÍTICO: API Key não configurada');
+        throw new Error('TMDB API Key não configurada. Verifique as variáveis de ambiente.');
     }
 
     try {
         const url = new URL(`${TMDB_BASE_URL}/tv/${tvId}`);
-        url.searchParams.set('api_key', TMDB_API_KEY);
+        url.searchParams.set('api_key', apiKey);
         url.searchParams.set('language', 'pt-BR');
+
+        console.log('[TMDB Details] Buscando detalhes do show ID:', tvId);
 
         const response = await fetch(url.toString());
 
         if (!response.ok) {
+            console.error('[TMDB Details Status]:', response.status, response.statusText);
+            const errorText = await response.text();
+            console.error('[TMDB Details Response Body]:', errorText);
             throw new Error(`TMDB API error: ${response.status} ${response.statusText}`);
         }
 
         const data: TMDBShowDetails = await response.json();
+        console.log('[TMDB Details] Detalhes obtidos com sucesso:', data.name);
         return data;
     } catch (error) {
-        console.error('Erro ao buscar detalhes do show:', error);
+        console.error('[TMDB Details Error]:', error);
         throw error;
     }
 }
