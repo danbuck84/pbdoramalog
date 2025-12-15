@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AddDramaDialog } from '@/components/add-drama-dialog';
 import { searchDramas } from '@/app/actions/tmdb';
 import { TMDBShow } from '@/types/tmdb';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -22,6 +23,8 @@ export function DramaSearch() {
     const [results, setResults] = useState<TMDBShow[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedShow, setSelectedShow] = useState<TMDBShow | null>(null);
 
     const debouncedQuery = useDebounce(query, 500);
 
@@ -51,14 +54,14 @@ export function DramaSearch() {
     }, [debouncedQuery]);
 
     const handleAddDrama = (show: TMDBShow) => {
-        console.log('🎬 Drama selecionado para adicionar:', {
-            id: show.id,
-            nome: show.name,
-            ano: show.first_air_date?.substring(0, 4),
-            nota: show.vote_average,
-        });
-        // TODO: Adicionar ao Firestore na próxima fase
-        alert(`Drama selecionado: ${show.name}\n\nTODO: Implementar integração com Firestore`);
+        setSelectedShow(show);
+        setDialogOpen(true);
+    };
+
+    const handleSuccess = () => {
+        // Limpa a busca após adicionar com sucesso
+        setQuery('');
+        setResults([]);
     };
 
     return (
@@ -158,6 +161,14 @@ export function DramaSearch() {
                     </p>
                 ) : null}
             </div>
+
+            {/* Dialog de Adicionar Drama */}
+            <AddDramaDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                show={selectedShow}
+                onSuccess={handleSuccess}
+            />
         </div>
     );
 }

@@ -5,46 +5,12 @@ import { ContinueWatchingCard } from '@/components/ContinueWatchingCard';
 import { DramaSearch } from '@/components/drama-search';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Drama } from '@/types/drama';
-import { Plus } from 'lucide-react';
-
-// Dados mock para demonstração
-const mockDramas: Drama[] = [
-  {
-    id: '1',
-    title: 'Crash Landing on You',
-    poster_path: '/wlWGGe4t5sXo5Y99pM1B3H3lk15.jpg',
-    status: 'watching',
-    chosenBy: 'Carol',
-    ratings: { dan: 4.5, carol: 5 },
-    totalEpisodes: 16,
-    watchedEpisodes: 8,
-  },
-  {
-    id: '2',
-    title: 'Goblin',
-    poster_path: '/sYHJIt2CdJOv1cGofS7N23lTcVp.jpg',
-    status: 'watching',
-    chosenBy: 'Dan',
-    ratings: { dan: 5, carol: 4.5 },
-    totalEpisodes: 16,
-    watchedEpisodes: 12,
-  },
-  {
-    id: '3',
-    title: 'Hotel Del Luna',
-    poster_path: '/8KKLq6x9HyR5QY5hMqKbWX73Pkt.jpg',
-    status: 'completed',
-    chosenBy: 'Carol',
-    ratings: { dan: 4, carol: 4.5 },
-    totalEpisodes: 16,
-    watchedEpisodes: 16,
-  },
-];
-
+import { useDramas } from '@/hooks/useDramas';
+import { Plus, Loader2 } from 'lucide-react';
 
 export default function Home() {
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { dramas, isLoading } = useDramas();
 
   return (
     <>
@@ -67,26 +33,46 @@ export default function Home() {
         <section className="container max-w-6xl mx-auto px-6 py-8">
           <h2 className="text-2xl font-semibold mb-6">Continue Assistindo</h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {mockDramas
-              .filter((d) => d.status === 'watching')
-              .map((drama) => (
-                <ContinueWatchingCard key={drama.id} drama={drama} />
-              ))}
-          </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : dramas.filter((d) => d.status === 'watching').length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {dramas
+                .filter((d) => d.status === 'watching')
+                .map((drama) => (
+                  <ContinueWatchingCard key={drama.id} drama={drama} />
+                ))}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-12">
+              Nenhum dorama em andamento. Clique no botão <span className="text-primary font-semibold">+</span> para adicionar!
+            </p>
+          )}
         </section>
 
         {/* Completados */}
         <section className="container max-w-6xl mx-auto px-6 py-8">
           <h2 className="text-2xl font-semibold mb-6">Completados</h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {mockDramas
-              .filter((d) => d.status === 'completed')
-              .map((drama) => (
-                <ContinueWatchingCard key={drama.id} drama={drama} />
-              ))}
-          </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : dramas.filter((d) => d.status === 'completed').length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {dramas
+                .filter((d) => d.status === 'completed')
+                .map((drama) => (
+                  <ContinueWatchingCard key={drama.id} drama={drama} />
+                ))}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-12">
+              Nenhum dorama completado ainda.
+            </p>
+          )}
         </section>
       </main>
 
