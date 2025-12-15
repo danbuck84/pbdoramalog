@@ -32,4 +32,13 @@ export interface TMDBShowDetails extends TMDBShow {
     status: string; // "Ended", "Returning Series", etc.
     tagline: string;
     genres: { id: number; name: string }[];
+    episode_run_time?: number[]; // Duração média dos episódios
+    credits?: {
+        cast: Array<{
+            id: number;
+            name: string;
+            character: string;
+            profile_path: string | null;
+        }>;
+    };
 }
