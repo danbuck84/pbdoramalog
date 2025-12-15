@@ -1,5 +1,12 @@
+'use client';
+
+import { useState } from 'react';
 import { ContinueWatchingCard } from '@/components/ContinueWatchingCard';
+import { SearchDialog } from '@/components/SearchDialog';
+import { Button } from '@/components/ui/button';
 import { Drama } from '@/types/drama';
+import { TMDBShow } from '@/types/tmdb';
+import { Search } from 'lucide-react';
 
 // Dados mock para demonstração
 const mockDramas: Drama[] = [
@@ -35,46 +42,76 @@ const mockDramas: Drama[] = [
   },
 ];
 
+
 export default function Home() {
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const handleSelectShow = (show: TMDBShow) => {
+    console.log('Dorama selecionado:', show);
+    // TODO: Adicionar ao Firestore (próxima fase)
+    alert(`Selecionado: ${show.name}\nTODO: Adicionar integração com Firestore`);
+  };
+
   return (
-    <main className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="container max-w-6xl mx-auto px-6 py-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-            PB DoramaLog
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Tracker de Doramas: Dan & Carol 💙💗
-          </p>
-        </div>
-      </header>
+    <>
+      <main className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="border-b border-border sticky top-0 z-50 bg-background/80 backdrop-blur-md">
+          <div className="container max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                PB DoramaLog
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Tracker de Doramas: Dan & Carol 💙💗
+              </p>
+            </div>
 
-      {/* Continue Assistindo */}
-      <section className="container max-w-6xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-semibold mb-6">Continue Assistindo</h2>
+            {/* Botão de busca */}
+            <Button
+              onClick={() => setSearchOpen(true)}
+              size="lg"
+              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+            >
+              <Search className="mr-2 h-5 w-5" />
+              Buscar Dorama
+            </Button>
+          </div>
+        </header>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {mockDramas
-            .filter((d) => d.status === 'watching')
-            .map((drama) => (
-              <ContinueWatchingCard key={drama.id} drama={drama} />
-            ))}
-        </div>
-      </section>
+        {/* Continue Assistindo */}
+        <section className="container max-w-6xl mx-auto px-6 py-8">
+          <h2 className="text-2xl font-semibold mb-6">Continue Assistindo</h2>
 
-      {/* Completados */}
-      <section className="container max-w-6xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-semibold mb-6">Completados</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {mockDramas
+              .filter((d) => d.status === 'watching')
+              .map((drama) => (
+                <ContinueWatchingCard key={drama.id} drama={drama} />
+              ))}
+          </div>
+        </section>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {mockDramas
-            .filter((d) => d.status === 'completed')
-            .map((drama) => (
-              <ContinueWatchingCard key={drama.id} drama={drama} />
-            ))}
-        </div>
-      </section>
-    </main>
+        {/* Completados */}
+        <section className="container max-w-6xl mx-auto px-6 py-8">
+          <h2 className="text-2xl font-semibold mb-6">Completados</h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {mockDramas
+              .filter((d) => d.status === 'completed')
+              .map((drama) => (
+                <ContinueWatchingCard key={drama.id} drama={drama} />
+              ))}
+          </div>
+        </section>
+      </main>
+
+      {/* Search Dialog */}
+      <SearchDialog
+        open={searchOpen}
+        onOpenChange={setSearchOpen}
+        onSelectShow={handleSelectShow}
+      />
+    </>
   );
 }
