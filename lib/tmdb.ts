@@ -1,5 +1,7 @@
 import { TMDBSearchResult, TMDBShowDetails } from '@/types/tmdb';
 
+// HARDCODED API KEY para garantir funcionamento em produção
+const API_KEY = "ecf96accd07316dca02dc0656f3c0a93";
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 /**
@@ -18,17 +20,7 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
  * @returns Lista de resultados da busca
  */
 export async function searchTVShows(query: string): Promise<TMDBSearchResult> {
-    // ROBUST KEY CHECK: Tenta múltiplas fontes
-    const apiKey = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY;
-
-    // LOG DE DEBUG (servidor)
-    console.log('[TMDB] Usando chave:', apiKey ? `Sim (Length: ${apiKey.length})` : 'NÃO ENCONTRADA');
-
-    if (!apiKey) {
-        console.error('[TMDB] ERRO CRÍTICO: API Key não configurada em nenhuma variável de ambiente');
-        // Não quebra a aplicação, retorna array vazio
-        return { page: 1, results: [], total_pages: 0, total_results: 0 };
-    }
+    console.log('[TMDB] Usando API Key hardcoded (Length:', API_KEY.length, ')');
 
     if (!query.trim()) {
         return { page: 1, results: [], total_pages: 0, total_results: 0 };
@@ -36,12 +28,12 @@ export async function searchTVShows(query: string): Promise<TMDBSearchResult> {
 
     try {
         const url = new URL(`${TMDB_BASE_URL}/search/tv`);
-        url.searchParams.set('api_key', apiKey);
+        url.searchParams.set('api_key', API_KEY);
         url.searchParams.set('query', query);
         url.searchParams.set('language', 'pt-BR'); // Resultados em português
         url.searchParams.set('include_adult', 'false');
 
-        console.log('[TMDB] Fazendo requisição para:', url.toString().replace(apiKey, 'HIDDEN'));
+        console.log('[TMDB] Fazendo requisição para busca...');
 
         const response = await fetch(url.toString());
 
@@ -70,19 +62,11 @@ export async function searchTVShows(query: string): Promise<TMDBSearchResult> {
  * @returns Detalhes completos do show
  */
 export async function getTVShowDetails(tvId: number): Promise<TMDBShowDetails> {
-    // ROBUST KEY CHECK: Tenta múltiplas fontes
-    const apiKey = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY;
-
-    console.log('[TMDB Details] Usando chave:', apiKey ? `Sim (Length: ${apiKey.length})` : 'NÃO ENCONTRADA');
-
-    if (!apiKey) {
-        console.error('[TMDB Details] ERRO CRÍTICO: API Key não configurada');
-        throw new Error('TMDB API Key não configurada. Verifique as variáveis de ambiente.');
-    }
+    console.log('[TMDB Details] Usando API Key hardcoded (Length:', API_KEY.length, ')');
 
     try {
         const url = new URL(`${TMDB_BASE_URL}/tv/${tvId}`);
-        url.searchParams.set('api_key', apiKey);
+        url.searchParams.set('api_key', API_KEY);
         url.searchParams.set('language', 'pt-BR');
 
         console.log('[TMDB Details] Buscando detalhes do show ID:', tvId);
