@@ -4,11 +4,7 @@ import { use } from 'react';
 import { useDrama } from '@/hooks/useDrama';
 import { updateDramaProgress, updateDramaRating, deleteDrama } from '@/app/actions/dramas';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Star, Plus, Minus, Trash2, Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Heart, Trash2, Plus, Minus } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -20,10 +16,10 @@ interface PageProps {
 }
 
 /**
- * Página de detalhes do dorama com design Dark Cinema
- * - Edição de ratings (Dan e Carol)
- * - Controle de progresso de episódios
- * - Botão de exclusão
+ * Página de detalhes do dorama com estética K-Pop vibrante
+ * - Glassmorphism e gradientes
+ * - Edição de ratings com corações
+ * - Controle de progresso fluido
  */
 export default function DramaDetailsPage({ params }: PageProps) {
     const { id: firestoreId } = use(params);
@@ -76,22 +72,26 @@ export default function DramaDetailsPage({ params }: PageProps) {
         }
     };
 
-    // Renderiza estrelas
-    const renderStars = (currentRating: number, onRate: (rating: number) => void) => {
+    // Renderiza corações (K-Pop style)
+    const renderHearts = (currentRating: number, onRate: (rating: number) => void, color: string) => {
         return (
             <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
+                {[1, 2, 3, 4, 5].map((heart) => (
                     <button
-                        key={star}
-                        onClick={() => onRate(star)}
+                        key={heart}
+                        onClick={() => onRate(heart)}
                         disabled={isUpdating}
-                        className="transition-transform hover:scale-110 disabled:opacity-50"
+                        className="transition-all hover:scale-125 disabled:opacity-50 active:scale-95"
                     >
-                        <Star
-                            className={`w-8 h-8 ${star <= currentRating
-                                    ? 'fill-yellow-400 text-yellow-400'
-                                    : 'fill-muted text-muted'
+                        <Heart
+                            className={`w-7 h-7 ${heart <= currentRating
+                                    ? `fill-${color} text-${color}`
+                                    : 'fill-gray-800/30 text-gray-600/50'
                                 }`}
+                            style={{
+                                fill: heart <= currentRating ? color : 'rgba(55, 65, 81, 0.3)',
+                                color: heart <= currentRating ? color : 'rgba(75, 85, 99, 0.5)'
+                            }}
                         />
                     </button>
                 ))}
@@ -101,18 +101,20 @@ export default function DramaDetailsPage({ params }: PageProps) {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-background-dark dark flex items-center justify-center">
-                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-950 flex items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-pink-500" />
             </div>
         );
     }
 
     if (!drama) {
         return (
-            <div className="min-h-screen bg-background-dark dark flex flex-col items-center justify-center gap-4">
+            <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-950 flex flex-col items-center justify-center gap-4">
                 <p className="text-white text-xl">Dorama não encontrado</p>
                 <Link href="/">
-                    <Button>Voltar para Home</Button>
+                    <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90">
+                        Voltar para Home
+                    </Button>
                 </Link>
             </div>
         );
@@ -122,9 +124,14 @@ export default function DramaDetailsPage({ params }: PageProps) {
     const averageRating = ((drama.ratings.dan + drama.ratings.carol) / 2).toFixed(1);
 
     return (
-        <div className="min-h-screen bg-background-dark dark text-white">
-            {/* Header com backdrop */}
-            <div className="relative h-[50vh] w-full overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-950 text-white relative overflow-hidden">
+            {/* Background Decorative Gradients */}
+            <div className="absolute top-0 left-0 w-full h-[60vh] bg-gradient-to-br from-purple-600/20 via-pink-500/20 to-cyan-400/20 blur-3xl" />
+            <div className="absolute top-40 right-0 w-96 h-96 bg-purple-600/30 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl" />
+
+            {/* Hero Section com backdrop */}
+            <div className="relative h-[55vh] w-full overflow-hidden">
                 <div className="absolute inset-0">
                     <Image
                         src={`https://image.tmdb.org/t/p/original${drama.poster_path}`}
@@ -133,153 +140,178 @@ export default function DramaDetailsPage({ params }: PageProps) {
                         className="object-cover"
                         priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/70 to-transparent" />
+                    {/* Gradient Overlays K-Pop Style */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-zinc-950" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-pink-500/20 to-cyan-400/30 mix-blend-overlay" />
                 </div>
 
-                {/* Botão Voltar */}
+                {/* Botão Voltar (Glassmorphism) */}
                 <Link href="/" className="absolute top-6 left-6 z-10">
-                    <Button variant="outline" className="bg-black/50 border-white/20 hover:bg-black/70">
-                        <ArrowLeft className="mr-2 h-5 w-5" />
-                        Voltar
-                    </Button>
+                    <button className="flex items-center justify-center size-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition">
+                        <ArrowLeft className="h-5 w-5" />
+                    </button>
                 </Link>
 
-                <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
-                    <h1 className="text-4xl font-bold">{drama.title}</h1>
+                {/* Título e Pills na parte inferior */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 space-y-3 z-10">
+                    {/* Status Pill */}
+                    <span className="inline-block px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-primary text-xs font-bold uppercase tracking-wider">
+                        {drama.status === 'watching' && '▶️ Assistindo'}
+                        {drama.status === 'completed' && '✓ Completo'}
+                        {drama.status === 'watchlist' && '📋 Quero Ver'}
+                    </span>
+
+                    <h1 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight drop-shadow-lg">
+                        {drama.title}
+                    </h1>
+
+                    {/* Pill "Escolhido por" */}
                     <div className="flex gap-2">
-                        <Badge
-                            variant="outline"
-                            className={`${drama.chosenBy === 'Dan'
-                                    ? 'border-primary text-primary'
-                                    : 'border-secondary text-secondary'
-                                }`}
-                        >
-                            Escolhido por {drama.chosenBy}
-                        </Badge>
-                        <Badge variant="secondary">
-                            {drama.status === 'watching' && 'Assistindo'}
-                            {drama.status === 'completed' && 'Completo'}
-                            {drama.status === 'watchlist' && 'Lista'}
-                        </Badge>
+                        <span className={`px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-md border ${drama.chosenBy === 'Dan'
+                                ? 'bg-blue-500/20 border-blue-400/30 text-blue-300'
+                                : 'bg-pink-500/20 border-pink-400/30 text-pink-300'
+                            }`}>
+                            {drama.chosenBy === 'Dan' ? '💙 Escolhido por Dan' : '💗 Escolhido por Carol'}
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="container max-w-4xl mx-auto px-6 py-8 space-y-8">
-                {/* Split Rating System */}
-                <Card className="bg-card border-border">
-                    <CardContent className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {/* Nota Média */}
-                            <div className="md:col-span-3 flex flex-col items-center justify-center py-6 border-b border-border">
-                                <p className="text-sm text-muted-foreground mb-2">Nota Média</p>
-                                <div className="text-6xl font-bold mb-3">{averageRating}</div>
-                                <div className="flex gap-1">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <Star
-                                            key={star}
-                                            className={`w-6 h-6 ${star <= Math.round(parseFloat(averageRating))
-                                                    ? 'fill-yellow-400 text-yellow-400'
-                                                    : 'fill-muted text-muted'
-                                                }`}
-                                        />
-                                    ))}
-                                </div>
+            {/* Main Content */}
+            <div className="relative z-10 px-4 md:px-6 pb-24 -mt-20 max-w-4xl mx-auto">
+                {/* Glassmorphism Card - Rating System */}
+                <div className="bg-white/10 dark:bg-white/5 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 md:p-8 shadow-2xl mb-6">
+                    {/* Nota Média - Destaque central */}
+                    <div className="flex flex-col items-center justify-center pb-6 mb-6 border-b border-white/10">
+                        <p className="text-sm text-gray-400 uppercase tracking-wider mb-2">Nota Média</p>
+                        <div className="flex items-center gap-4">
+                            <div className="text-6xl font-black bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                                {averageRating}
                             </div>
-
-                            {/* Nota Dan */}
-                            <div className="flex flex-col items-center space-y-3 p-4">
-                                <Avatar className="w-16 h-16 border-2 border-primary">
-                                    <AvatarFallback className="bg-primary/20 text-primary text-lg font-semibold">
-                                        D
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="text-center space-y-1">
-                                    <p className="text-sm text-muted-foreground">Dan</p>
-                                    <p className="text-2xl font-bold">{drama.ratings.dan.toFixed(1)}</p>
-                                    {renderStars(drama.ratings.dan, (rating) => handleUpdateRating('dan', rating))}
-                                </div>
-                            </div>
-
-                            <Separator orientation="vertical" className="hidden md:block justify-self-center h-full" />
-
-                            {/* Nota Carol */}
-                            <div className="flex flex-col items-center space-y-3 p-4">
-                                <Avatar className="w-16 h-16 border-2 border-secondary">
-                                    <AvatarFallback className="bg-secondary/20 text-secondary text-lg font-semibold">
-                                        C
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="text-center space-y-1">
-                                    <p className="text-sm text-muted-foreground">Carol</p>
-                                    <p className="text-2xl font-bold">{drama.ratings.carol.toFixed(1)}</p>
-                                    {renderStars(drama.ratings.carol, (rating) => handleUpdateRating('carol', rating))}
-                                </div>
+                            <div className="flex gap-1">
+                                {[1, 2, 3, 4, 5].map((heart) => (
+                                    <Heart
+                                        key={heart}
+                                        className={`w-6 h-6 ${heart <= Math.round(parseFloat(averageRating))
+                                                ? 'fill-pink-500 text-pink-500'
+                                                : 'fill-gray-700 text-gray-700'
+                                            }`}
+                                    />
+                                ))}
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
 
-                {/* Controle de Progresso */}
-                <Card className="bg-card border-border">
-                    <CardContent className="p-6 space-y-4">
-                        <h3 className="text-lg font-semibold">Progresso</h3>
-                        <div className="space-y-4">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                    Episódio {drama.watchedEpisodes} de {drama.totalEpisodes}
-                                </span>
-                                <span className="font-medium">{Math.round(progress)}%</span>
-                            </div>
-                            <div className="relative h-3 w-full overflow-hidden rounded-full bg-muted">
-                                <div
-                                    className={`h-full transition-all ${drama.chosenBy === 'Dan'
-                                            ? 'bg-gradient-to-r from-primary to-cyan-400'
-                                            : 'bg-gradient-to-r from-secondary to-accent'
-                                        }`}
-                                    style={{ width: `${progress}%` }}
-                                />
-                            </div>
-
-                            {/* Botões de Controle */}
-                            <div className="flex items-center justify-center gap-4">
-                                <Button
-                                    onClick={() => handleUpdateProgress(-1)}
-                                    disabled={isUpdating || drama.watchedEpisodes === 0}
-                                    variant="outline"
-                                    size="lg"
-                                >
-                                    <Minus className="h-5 w-5" />
-                                </Button>
-                                <div className="text-center min-w-[100px]">
-                                    <p className="text-2xl font-bold">{drama.watchedEpisodes}</p>
-                                    <p className="text-xs text-muted-foreground">episódios</p>
+                    {/* Ratings individuais - Dan e Carol */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Dan */}
+                        <div className="flex flex-col items-center space-y-4 p-4 rounded-2xl bg-blue-500/10 border border-blue-400/20">
+                            {/* Avatar com anel gradiente */}
+                            <div className="relative">
+                                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 blur-sm" />
+                                <div className="relative flex items-center justify-center size-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 border-2 border-blue-300/50">
+                                    <span className="text-2xl font-black text-white">D</span>
                                 </div>
-                                <Button
-                                    onClick={() => handleUpdateProgress(1)}
-                                    disabled={isUpdating || drama.watchedEpisodes === drama.totalEpisodes}
-                                    variant="outline"
-                                    size="lg"
-                                >
-                                    <Plus className="h-5 w-5" />
-                                </Button>
+                            </div>
+
+                            <div className="text-center space-y-2">
+                                <p className="text-sm text-blue-300 font-semibold">Dan</p>
+                                <p className="text-3xl font-bold text-white">{drama.ratings.dan.toFixed(1)}</p>
+                                {renderHearts(drama.ratings.dan, (rating) => handleUpdateRating('dan', rating), '#3b82f6')}
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
+
+                        {/* Carol */}
+                        <div className="flex flex-col items-center space-y-4 p-4 rounded-2xl bg-pink-500/10 border border-pink-400/20">
+                            {/* Avatar com anel gradiente */}
+                            <div className="relative">
+                                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 blur-sm" />
+                                <div className="relative flex items-center justify-center size-16 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 border-2 border-pink-300/50">
+                                    <span className="text-2xl font-black text-white">C</span>
+                                </div>
+                            </div>
+
+                            <div className="text-center space-y-2">
+                                <p className="text-sm text-pink-300 font-semibold">Carol</p>
+                                <p className="text-3xl font-bold text-white">{drama.ratings.carol.toFixed(1)}</p>
+                                {renderHearts(drama.ratings.carol, (rating) => handleUpdateRating('carol', rating), '#ec4899')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Glassmorphism Card - Progresso */}
+                <div className="bg-white/10 dark:bg-white/5 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 md:p-8 shadow-2xl mb-6">
+                    <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span className="text-2xl">📺</span>
+                        Progresso
+                    </h3>
+
+                    <div className="space-y-6">
+                        {/* Info e Percentual */}
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-300">
+                                Episódio {drama.watchedEpisodes} de {drama.totalEpisodes}
+                            </span>
+                            <span className="font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                                {Math.round(progress)}%
+                            </span>
+                        </div>
+
+                        {/* Barra de Progresso Fluida */}
+                        <div className="relative h-4 w-full overflow-hidden rounded-full bg-white/10">
+                            <div
+                                className={`h-full transition-all duration-500 ease-out rounded-full ${drama.chosenBy === 'Dan'
+                                        ? 'bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500'
+                                        : 'bg-gradient-to-r from-pink-500 via-purple-600 to-pink-500'
+                                    } shadow-lg`}
+                                style={{
+                                    width: `${progress}%`,
+                                    boxShadow: drama.chosenBy === 'Dan'
+                                        ? '0 0 20px rgba(59, 130, 246, 0.5)'
+                                        : '0 0 20px rgba(236, 72, 153, 0.5)'
+                                }}
+                            />
+                        </div>
+
+                        {/* Controles */}
+                        <div className="flex items-center justify-center gap-6">
+                            <button
+                                onClick={() => handleUpdateProgress(-1)}
+                                disabled={isUpdating || drama.watchedEpisodes === 0}
+                                className="flex items-center justify-center size-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all disabled:opacity-30 active:scale-95"
+                            >
+                                <Minus className="h-5 w-5" />
+                            </button>
+
+                            <div className="text-center min-w-[100px]">
+                                <p className="text-4xl font-black bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                                    {drama.watchedEpisodes}
+                                </p>
+                                <p className="text-xs text-gray-400 uppercase tracking-wider">episódios</p>
+                            </div>
+
+                            <button
+                                onClick={() => handleUpdateProgress(1)}
+                                disabled={isUpdating || drama.watchedEpisodes === drama.totalEpisodes}
+                                className="flex items-center justify-center size-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 text-white transition-all disabled:opacity-30 active:scale-95 shadow-lg"
+                            >
+                                <Plus className="h-5 w-5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Botão Excluir */}
-                <div className="flex justify-center py-4">
-                    <Button
+                <div className="flex justify-center">
+                    <button
                         onClick={handleDelete}
                         disabled={isUpdating}
-                        variant="destructive"
-                        size="lg"
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 font-bold transition-all disabled:opacity-50"
                     >
-                        <Trash2 className="mr-2 h-5 w-5" />
+                        <Trash2 className="h-5 w-5" />
                         Excluir Dorama
-                    </Button>
+                    </button>
                 </div>
             </div>
         </div>
