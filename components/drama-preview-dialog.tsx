@@ -33,10 +33,10 @@ export function DramaPreviewDialog({ open, onOpenChange, details, isLoading, onA
                     </div>
                 ) : details ? (
                     <>
+                        <DialogTitle className="text-2xl font-bold">{details.name}</DialogTitle>
                         <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold">{details.name}</DialogTitle>
-                            <DialogDescription className="sr-only">
-                                Detalhes completos do dorama {details.name}
+                            <DialogDescription className="text-sm text-muted-foreground">
+                                Detalhes completos do dorama antes de adicionar à lista
                             </DialogDescription>
                         </DialogHeader>
 
@@ -84,7 +84,7 @@ export function DramaPreviewDialog({ open, onOpenChange, details, isLoading, onA
                                         {details.episode_run_time?.[0] && (
                                             <div className="flex items-center gap-1 text-muted-foreground">
                                                 <Clock className="h-4 w-4" />
-                                                <span>{details.episode_run_time[0]} min</span>
+                                                <span>{details.episode_run_time[0]} min/ep</span>
                                             </div>
                                         )}
                                     </div>

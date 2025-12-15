@@ -68,6 +68,7 @@ export async function getTVShowDetails(tvId: number): Promise<TMDBShowDetails> {
         const url = new URL(`${TMDB_BASE_URL}/tv/${tvId}`);
         url.searchParams.set('api_key', API_KEY);
         url.searchParams.set('language', 'pt-BR');
+        url.searchParams.set('append_to_response', 'credits'); // Busca elenco junto
 
         console.log('[TMDB Details] Buscando detalhes do show ID:', tvId);
 
