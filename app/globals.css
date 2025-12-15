@@ -48,77 +48,108 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Cores personalizadas PB DoramaLog */
+  --primary: #135bec;
+  /* Azul Dan */
+  --primary-foreground: #ffffff;
+  --secondary: #f472b6;
+  /* Rosa Carol */
+  --secondary-foreground: #ffffff;
+  --accent: #d946ef;
+  /* Roxo Neon */
+  --accent-foreground: #ffffff;
+
+  /* Backgrounds */
+  --background-start: #f8f7ff;
+  /* Home K-Pop vibrante */
+  --background-dark: #0a0a0a;
+  /* Detalhes Dark Cinema */
+  --background: #f8f7ff;
+  --foreground: #0a0a0a;
+
+  /* UI Elements */
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --destructive: #ef4444;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #135bec;
+
+  /* Gradientes customizados (via CSS vars) */
+  --dan-gradient: linear-gradient(135deg, #135bec 0%, #06b6d4 100%);
+  --carol-gradient: linear-gradient(135deg, #f472b6 0%, #d946ef 100%);
+
+  /* Charts */
+  --chart-1: #135bec;
+  --chart-2: #f472b6;
+  --chart-3: #d946ef;
+  --chart-4: #06b6d4;
+  --chart-5: #a78bfa;
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #135bec;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f4f6;
+  --sidebar-accent-foreground: #0a0a0a;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #135bec;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Backgrounds Dark Cinema */
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+
+  /* Cores mantém vibrância no dark */
+  --primary: #135bec;
+  --primary-foreground: #ffffff;
+  --secondary: #f472b6;
+  --secondary-foreground: #ffffff;
+  --accent: #d946ef;
+  --accent-foreground: #ffffff;
+
+  /* UI Elements Dark */
+  --card: #1a1a1a;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1a;
+  --popover-foreground: #ffffff;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --destructive: #ef4444;
+  --border: #262626;
+  --input: #262626;
+  --ring: #135bec;
+
+  /* Charts Dark */
+  --chart-1: #135bec;
+  --chart-2: #f472b6;
+  --chart-3: #d946ef;
+  --chart-4: #06b6d4;
+  --chart-5: #a78bfa;
+
+  /* Sidebar Dark */
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #135bec;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #262626;
+  --sidebar-ring: #135bec;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
