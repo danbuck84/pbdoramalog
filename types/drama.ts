@@ -4,10 +4,11 @@
  */
 export interface Drama {
     id: string; // TMDB ID
+    firestoreId?: string; // Firestore Document ID
     title: string;
     poster_path: string;
     status: 'watching' | 'completed' | 'watchlist';
-    chosenBy?: 'Dan' | 'Carol'; // Opcional para watchlist, obrigatório para watching
+    chosenBy?: 'Dan' | 'Carol'; // Define a cor da barra de progresso! (Opcional para watchlist / completed)
     ratings: {
         dan: number;   // 0 a 5
         carol: number; // 0 a 5
