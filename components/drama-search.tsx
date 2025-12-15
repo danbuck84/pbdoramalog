@@ -6,14 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AddDramaDialog } from '@/components/add-drama-dialog';
-import { searchDramas } from '@/app/actions/tmdb';
 import { TMDBShow } from '@/types/tmdb';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Search, Loader2, Plus } from 'lucide-react';
 import Image from 'next/image';
 
+// HARDCODED API KEY - Client-side fetch para bypass de Server Actions
+const API_KEY = "ecf96accd07316dca02dc0656f3c0a93";
+const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+
 /**
- * Componente de busca de doramas usando Server Actions
+ * Componente de busca de doramas usando fetch client-side
+ * - Executa direto no navegador (bypass de Server Actions)
  * - Debounce de 500ms para otimizar chamadas
  * - Cards verticais com poster à esquerda
  * - Botão "Adicionar" em cada resultado
@@ -28,7 +32,7 @@ export function DramaSearch() {
 
     const debouncedQuery = useDebounce(query, 500);
 
-    // Busca automática quando o query muda
+    // Busca automática quando o query muda (CLIENT-SIDE)
     useEffect(() => {
         async function performSearch() {
             if (!debouncedQuery.trim()) {
@@ -40,11 +44,29 @@ export function DramaSearch() {
             setError(null);
 
             try {
-                const data = await searchDramas(debouncedQuery);
-                setResults(data.results);
+                // FETCH DIRETO NO NAVEGADOR (Client-Side)
+                const url = new URL(`${TMDB_BASE_URL}/search/tv`);
+                url.searchParams.set('api_key', API_KEY);
+                url.searchParams.set('query', debouncedQuery);
+                url.searchParams.set('language', 'pt-BR');
+                url.searchParams.set('include_adult', 'false');
+
+                console.log('[CLIENT] Fazendo busca TMDB...', debouncedQuery);
+
+                const response = await fetch(url.toString());
+
+                if (!response.ok) {
+                    console.error('[CLIENT] Erro HTTP:', response.status);
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('[CLIENT] Resultados:', data.results?.length || 0);
+                setResults(data.results || []);
             } catch (err) {
-                console.error('Erro na busca:', err);
+                console.error('[CLIENT] Erro na busca:', err);
                 setError('Erro ao buscar doramas. Tente novamente.');
+                setResults([]);
             } finally {
                 setIsLoading(false);
             }
